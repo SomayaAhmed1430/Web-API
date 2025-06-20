@@ -18,6 +18,12 @@ namespace ProviderAPI
 
             builder.Services.AddDbContext<Models.ITIContext>( options => options.UseSqlServer(builder.Configuration.GetConnectionString("CS")));
 
+            builder.Services.AddControllers()
+                            .AddJsonOptions(options =>
+                            {
+                                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+                            });
+
 
             // CORS
             builder.Services.AddCors(options =>

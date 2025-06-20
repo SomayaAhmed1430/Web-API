@@ -30,5 +30,18 @@ namespace ProviderAPI.Controllers
 
             return Ok(empDTOs);
         }
+
+
+        [HttpGet("{id:int}")]
+        public IActionResult GetById(int id) 
+        {
+            var emp = context.Employees
+                             .Include(e => e.Department)
+                             .FirstOrDefault(e => e.Id == id);
+
+            if (emp == null)
+                return NotFound();
+            return Ok(emp);
+        }
     }
 }
