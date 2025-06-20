@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ProviderAPI.DTO;
 using ProviderAPI.Models;
 
 namespace ProviderAPI.Controllers
@@ -12,7 +14,7 @@ namespace ProviderAPI.Controllers
         ITIContext context;
         public DepartmentController(ITIContext context)
         {
-            this.context = context;    
+            this.context = context;
         }
 
 
@@ -29,7 +31,7 @@ namespace ProviderAPI.Controllers
         public IActionResult GetById(int id)
         {
             Department department = context.Departments.FirstOrDefault(x => x.Id == id);
-            if (department == null) 
+            if (department == null)
                 return NotFound();
             return Ok(department);
         }
@@ -40,7 +42,7 @@ namespace ProviderAPI.Controllers
         public IActionResult GetByName(string name)
         {
             Department department = context.Departments.FirstOrDefault(x => x.Name == name);
-            if (department == null) 
+            if (department == null)
                 return NotFound();
             return Ok(department);
         }
@@ -49,10 +51,10 @@ namespace ProviderAPI.Controllers
         [HttpPost]
         public IActionResult AddDepartment(Department department)
         {
-            context.Departments.Add(department); 
+            context.Departments.Add(department);
             context.SaveChanges();
 
-            return CreatedAtAction("GetById", new {id = department.Id }, department);
+            return CreatedAtAction("GetById", new { id = department.Id }, department);
         }
 
 
@@ -88,6 +90,39 @@ namespace ProviderAPI.Controllers
             return Ok("Deleted successfully");
         }
 
+        [HttpGet("EmpCount")]
+        public ActionResult<List<DeptWithEmp>> GetDeptDetails()
+        {
+            List<Department> depts = context.Departments.Include(d => d.Employees).ToList();
+
+            List<DeptWithEmp> DepptListDTO = new List<DeptWithEmp>();
+
+            foreach (var item in depts)
+            {
+                DeptWithEmp deptDTO = new DeptWithEmp();
+                deptDTO.DeptId = item.Id;
+                deptDTO.DeptName = item.Name;
+                deptDTO.EmpCount = item.Employees.Count.ToString();
+
+                DepptListDTO.Add(deptDTO);
+            }
+            return Ok(DepptListDTO);
+        }
+
+
+        [HttpGet("WithEmployees")]
+        public ActionResult<List<DeptWithEmps>> GetDeptsWithEmployees()
+        {
+            var depts = context.Departments.Include(d => d.Employees).ToList();
+
+            var deptDTOs = depts.Select(d => new DeptWithEmps
+            {
+                DeptName = d.Name,
+                EmpNames = d.Employees.Select(e => e.Name).ToList()
+            }).ToList();
+
+            return Ok(deptDTOs);
+        }
 
     }
 }

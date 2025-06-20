@@ -9,5 +9,6 @@ namespace ProviderAPI.Models
         }
 
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Employee> Employees { get; set; }
     }
 }
