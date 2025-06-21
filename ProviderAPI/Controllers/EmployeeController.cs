@@ -24,6 +24,7 @@ namespace ProviderAPI.Controllers
 
             var empDTOs = emps.Select(e => new EmpWithDept
             {
+                Id = e.Id,
                 EmpName = e.Name,
                 DeptName = e.Department?.Name
             }).ToList();
@@ -43,5 +44,25 @@ namespace ProviderAPI.Controllers
                 return NotFound();
             return Ok(emp);
         }
+
+
+        [HttpPost]
+        public IActionResult Add(AddNewEmp dto)
+        {
+            if (dto == null) return BadRequest();
+
+            Employee emp = new Employee
+            {
+                Name = dto.Name,
+                Address = dto.Address,
+                DepartmentId = dto.DepartmentId
+            };
+
+            context.Employees.Add(emp);
+            context.SaveChanges();
+
+            return CreatedAtAction(nameof(GetById), new { id = emp.Id }, emp);
+        }
+
     }
 }
