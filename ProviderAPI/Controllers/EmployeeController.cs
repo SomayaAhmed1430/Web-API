@@ -66,6 +66,22 @@ namespace ProviderAPI.Controllers
 
 
 
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, Employee updatedEmp)
+        {
+            var emp = context.Employees.FirstOrDefault(e => e.Id == id);
+            if (emp == null)
+                return NotFound();
+
+            emp.Name = updatedEmp.Name;
+            emp.Address = updatedEmp.Address;
+            emp.DepartmentId = updatedEmp.DepartmentId;
+
+            context.SaveChanges();
+
+            return Ok(emp);
+        }
+
 
 
 
