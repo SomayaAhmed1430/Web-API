@@ -64,5 +64,24 @@ namespace ProviderAPI.Controllers
             return CreatedAtAction(nameof(GetById), new { id = emp.Id }, emp);
         }
 
+
+
+
+
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var emp = context.Employees.FirstOrDefault(e => e.Id == id);
+            if (emp == null)
+                return NotFound();
+
+            context.Employees.Remove(emp);
+            context.SaveChanges();
+
+            return Ok("Deleted Successfully");
+        }
+
+
     }
 }
