@@ -90,6 +90,8 @@ namespace ProviderAPI.Controllers
             return Ok("Deleted successfully");
         }
 
+
+
         [HttpGet("EmpCount")]
         public ActionResult<List<DeptWithEmp>> GetDeptDetails()
         {
@@ -110,6 +112,7 @@ namespace ProviderAPI.Controllers
         }
 
 
+
         [HttpGet("WithEmployees")]
         public ActionResult<List<DeptWithEmps>> GetDeptsWithEmployees()
         {
@@ -123,6 +126,31 @@ namespace ProviderAPI.Controllers
 
             return Ok(deptDTOs);
         }
+
+
+
+        [HttpGet("WithEmployees/{name}")]
+        public IActionResult GetByNameWithEmployees(string name)
+        {
+            var dept = context.Departments
+                .Include(d => d.Employees)
+                .FirstOrDefault(d => d.Name == name);
+
+            if (dept == null)
+                return NotFound();
+
+            var dto = new DeptWithEmps
+            {
+                DeptName = dept.Name,
+                Description = dept.Description,
+                EmpNames = dept.Employees.Select(e => e.Name).ToList()
+            };
+
+            return Ok(dto);
+        }
+
+
+
 
     }
 }
