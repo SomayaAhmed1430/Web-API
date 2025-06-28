@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace ProviderAPI.Models
 {
-    public class ITIContext : DbContext
+    public class ITIContext : IdentityDbContext<ApplicationUser>
     {
         public ITIContext(DbContextOptions<ITIContext> options) :base(options) 
         {

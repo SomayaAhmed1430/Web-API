@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProviderAPI.DTO;
@@ -49,6 +50,7 @@ namespace ProviderAPI.Controllers
 
 
         [HttpPost]
+        [Authorize]
         public IActionResult AddDepartment(Department department)
         {
             context.Departments.Add(department);
@@ -76,6 +78,7 @@ namespace ProviderAPI.Controllers
 
 
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult Delete(int id)
         {
             var dept = context.Departments.FirstOrDefault(d => d.Id == id);

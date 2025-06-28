@@ -1,5 +1,10 @@
 
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using ProviderAPI.Models;
 
 namespace ProviderAPI
 {
@@ -18,11 +23,51 @@ namespace ProviderAPI
 
             builder.Services.AddDbContext<Models.ITIContext>( options => options.UseSqlServer(builder.Configuration.GetConnectionString("CS")));
 
+
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ITIContext>();
+
+
+            builder.Services.AddAuthentication(options => 
+            {
+                // search Bearer keyword JWT in req header instead cookie
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+
+                // to change from route of cookie => account/login | to JWT => unAuthorized
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+                // for any other behaviors => auth filter search JWT NOT COOKIE
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                // how to check if token valid
+                options.SaveToken = true;  // not expired
+                options.RequireHttpsMetadata = false;  // specific protocol
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["JWT:IssuerIP"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["JWT:AudienceIP"],
+
+                    // check signature
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:SecretKey"])),
+
+                };
+            });
+
+
             builder.Services.AddControllers()
-                            .AddJsonOptions(options =>
-                            {
-                                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-                            });
+                .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
+
+
+            builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+                options.SuppressMapClientErrors = true;
+            });
 
 
             // CORS
@@ -61,7 +106,7 @@ namespace ProviderAPI
 
             app.UseCors("AllowAll");
 
-            app.UseAuthorization();
+            app.UseAuthorization();  // Cookia
 
             app.MapControllers();
 
