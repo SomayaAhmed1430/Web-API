@@ -48,7 +48,6 @@ namespace ProviderAPI.Controllers
 
 
         [HttpPost]
-        [Authorize]
         public IActionResult Add(AddNewEmp dto)
         {
             if (dto == null) return BadRequest();
@@ -88,7 +87,6 @@ namespace ProviderAPI.Controllers
 
 
         [HttpDelete("{id}")]
-        [Authorize]
         public IActionResult Delete(int id)
         {
             var emp = context.Employees.FirstOrDefault(e => e.Id == id);
